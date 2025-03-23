@@ -1,0 +1,35 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+
+class AdminController extends Controller
+{
+    public function showLoginForm()
+    {
+        return view('admin.auth.login');
+    }
+
+    public function login(Request $request)
+    {
+        $request->validate([
+            'email' => 'required',
+            'password' => 'required'
+        ]);
+
+        if ($request->email === config('services.admin.email') &&
+            $request->password === config('services.admin.password')) {
+            session(['admin_logged_in' => true]);
+            return redirect()->route('admin.users.index');
+        }
+
+        return back()->withErrors(['credentials' => 'Неверные учетные данные']);
+    }
+
+    public function logout()
+    {
+        session()->forget('admin_logged_in');
+        return redirect()->route('login');
+    }
+}
